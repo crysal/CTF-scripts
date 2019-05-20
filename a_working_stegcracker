@@ -32,7 +32,7 @@ fi
 echo "Attacking file '$1' with wordlist '$wordlist'.."
 
 while read pass; do
-    if steghide extract -sf $1 -xf $1.out -p "$pass" -f > /dev/null 2>&1; then
+    if steghide extract -sf $1 -p "$pass" -f > /dev/null 2>&1; then
         echo "Successfully cracked file with password: $pass"
         echo "Your file has been written to: $1.out"
         exit 0
