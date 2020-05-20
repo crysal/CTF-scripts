@@ -20,14 +20,13 @@ SizeY=$(file $input1 | awk '{print $7}' | sed 's/,//g' )
 
 CurrentXCord=1
 CurrentYCord=1
-CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentYCord+$CurrentXCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
+while [ $CurrentYCord -ne $SizeY ] 
+do
 
+CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentYCord+$CurrentXCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
 BlankDecetcor=0 #Counter for blanks in a row, if goes above 1 should change row and put a slash(/)
 DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 put a Dot (.), if goes above 2 then blank goes to 1 put a Dash (-)
 
-
-while [ $CurrentYCord -ne $SizeY ] 
-do
 	if [ $CurrentXCord -eq $SizeX ]
 		then
 		CurrentXCord=0
