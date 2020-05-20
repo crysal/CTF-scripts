@@ -29,11 +29,15 @@ if [ $CurrentRGBValue -eq $BackgroundValue ]
 then
 BlankDecetcor=$(($BlankDecetcor+1))
 CurrentXCord=$(($CurrentXCord+1))
+#Debug echo
+echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
 fi
 if [ $CurrentRGBValue -eq $DotDecetor ]
 then
 DotDecetor=$(($DotDecetor+1))
 CurrentXCord=$(($CurrentXCord+1))
+#Debug echo
+echo "Current value is the same as a dot ($CurrentRGBValue = $DotDecetor)"
 fi
 
 if [ $BlankDecetcor -gt 1 ]
@@ -42,21 +46,32 @@ echo "/" >> morse
 BlankDecetcor=0
 DotDecetor=0
 CurrentYCord=$(($CurrentYCord+2))
+#Debug echo
+echo "Dected more than one blank spot after eachother, check morse for a / and $CurrentYCord +2"
 fi
 if [ $DotDecetor -eq 1 ] && [ $BlankDecetcor -eq 1 ]
 then
 echo "." >> morse
 BlankDecetcor=0
 DotDecetor=0
+#Debug echo
+echo "Dected a blank space after one dot space, check morse for a . nothing more should happen for now"
 fi
-if [ $DotDecetor -qt 1 ] && [ $BlankDecetcor -eq 1 ]
+if [ $DotDecetor -gt 1 ] && [ $BlankDecetcor -eq 1 ]
 then
 echo "-" >> morse
 BlankDecetcor=0
 DotDecetor=0
+#Debug echo
+echo "Dected a blank after more than one dot space, check morse for a - nothing more should happen for now"
 fi
 
-##DotDecetor making
-
+##ending checks of vars
+echo "CurrentRGBValue = $CurrentRGBValue"
+echo "CurrentXCord = $CurrentXCord"
+echo "CurrentYCord = $CurrentYCord"
+echo "BackgroundValue = $BackgroundValue"
+echo "DotValue = $DotValue"
+echo "Size = $SizeX , $SizeY"
 
 
