@@ -25,53 +25,69 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentYCord+$C
 BlankDecetcor=0 #Counter for blanks in a row, if goes above 1 should change row and put a slash(/)
 DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 put a Dot (.), if goes above 2 then blank goes to 1 put a Dash (-)
 
-if [ $CurrentRGBValue -eq $BackgroundValue ]
-then
-BlankDecetcor=$(($BlankDecetcor+1))
-CurrentXCord=$(($CurrentXCord+1))
-#Debug echo
-echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
-fi
-if [ $CurrentRGBValue -eq $DotDecetor ]
-then
-DotDecetor=$(($DotDecetor+1))
-CurrentXCord=$(($CurrentXCord+1))
-#Debug echo
-echo "Current value is the same as a dot ($CurrentRGBValue = $DotDecetor)"
-fi
+
+while [ $CurrentYCord -ne $SizeY ] 
+do
+	if [ $CurrentXCord -eq $SizeX ]
+		then
+		CurrentXCord=0
+		CurrentYCord=$(($CurrentYCord+1))
+	fi
+	if [ $CurrentRGBValue -eq $BackgroundValue ]
+		then
+		BlankDecetcor=$(($BlankDecetcor+1))
+		CurrentXCord=$(($CurrentXCord+1))
+		#Debug echo
+		echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
+	fi
+	if [ $CurrentRGBValue -eq $DotValue ]
+		then
+		DotDecetor=$(($DotDecetor+1))
+		CurrentXCord=$(($CurrentXCord+1))
+		#Debug echo
+		echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
+	fi
+done
+
+
 
 if [ $BlankDecetcor -gt 1 ]
-then 
-echo "/" >> morse 
-BlankDecetcor=0
-DotDecetor=0
-CurrentYCord=$(($CurrentYCord+2))
-#Debug echo
-echo "Dected more than one blank spot after eachother, check morse for a / and $CurrentYCord +2"
-fi
+	then 
+	echo "/" >> morse 
+	BlankDecetcor=0
+	DotDecetor=0
+	CurrentYCord=$(($CurrentYCord+2))
+	CurrentXCord=0
+	#Debug echo
+	echo "Dected more than one blank spot after eachother, check morse for a / and $CurrentYCord +2"
+	fi
 if [ $DotDecetor -eq 1 ] && [ $BlankDecetcor -eq 1 ]
-then
-echo "." >> morse
-BlankDecetcor=0
-DotDecetor=0
-#Debug echo
-echo "Dected a blank space after one dot space, check morse for a . nothing more should happen for now"
-fi
+	then
+	echo "." >> morse
+	BlankDecetcor=0
+	DotDecetor=0
+	#Debug echo
+	echo "Dected a blank space after one dot space, check morse for a . nothing more should happen for now"
+	fi
 if [ $DotDecetor -gt 1 ] && [ $BlankDecetcor -eq 1 ]
-then
-echo "-" >> morse
-BlankDecetcor=0
-DotDecetor=0
-#Debug echo
-echo "Dected a blank after more than one dot space, check morse for a - nothing more should happen for now"
-fi
+	then
+	echo "-" >> morse
+	BlankDecetcor=0
+	DotDecetor=0
+	#Debug echo
+	echo "Dected a blank after more than one dot space, check morse for a - nothing more should happen for now"
+	fi
 
 ##ending checks of vars
 echo "CurrentRGBValue = $CurrentRGBValue"
 echo "CurrentXCord = $CurrentXCord"
 echo "CurrentYCord = $CurrentYCord"
 echo "BackgroundValue = $BackgroundValue"
-echo "DotValue = $DotValue"
+echo "DotRGBValue = $DotValue"
 echo "Size = $SizeX , $SizeY"
 
 
+##TODO
+#make loops
+#make more loops in loops to make the loop loop around
+#make it work
