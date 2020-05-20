@@ -52,7 +52,7 @@ DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 
 		CurrentXCord=$(($CurrentXCord+1))
 		#Debug echo
 		echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
-		echo -ne "dot" >> raw_morse
+		echo -ne "dot" >> raw_morse #3 dots in a row = dash
 	fi
 	
 	if [ $BlankDecetcor -gt 1 ] #Checks if blanks have a number greater than 1, 
