@@ -47,11 +47,8 @@ do
 		#Debug echo
 		echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
 	fi
-done
-
-
-
-if [ $BlankDecetcor -gt 1 ]
+	
+	if [ $BlankDecetcor -gt 1 ]
 	then 
 	echo "/" >> morse 
 	BlankDecetcor=0
@@ -77,6 +74,8 @@ if [ $DotDecetor -gt 1 ] && [ $BlankDecetcor -eq 1 ]
 	#Debug echo
 	echo "Dected a blank after more than one dot space, check morse for a - nothing more should happen for now"
 	fi
+	
+done
 
 ##ending checks of vars
 echo "CurrentRGBValue = $CurrentRGBValue"
