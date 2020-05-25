@@ -20,16 +20,17 @@ DotValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+1+1 txt:- | tail -1 | a
 
 SizeX=$(file $input1 | awk '{print $5}')
 SizeY=$(file $input1 | awk '{print $7}' | sed 's/,//g' )
-#when setting cords based on file output remember to -1 cause of the offset of convert
+#when setting cords based on file output remember to -1(minus by one) cause of the offset of convert
 
-CurrentXCord=1
-CurrentYCord=1
+CurrentXCord=0
+CurrentYCord=0
+BlankDecetcor=0 #Counter for blanks in a row, if goes above 1 should change row and put a slash(/)
+DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 put a Dot (.), if goes above 2 then blank goes to 1 put a Dash (-)
 while [ $CurrentYCord -lt $SizeY ] 
 do
 
 CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$CurrentYCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
-BlankDecetcor=0 #Counter for blanks in a row, if goes above 1 should change row and put a slash(/)
-DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 put a Dot (.), if goes above 2 then blank goes to 1 put a Dash (-)
+
 
 	if [ $CurrentXCord -eq $SizeX ] #Checks if reached the edge of image, if goes to next line
 		then
@@ -42,7 +43,7 @@ DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 
 		BlankDecetcor=$(($BlankDecetcor+1))
 		CurrentXCord=$(($CurrentXCord+1))
 		#Debug echo
-		echo -ne "space" >> raw_morse 
+		echo -ne " space " >> raw_morse 
 		echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
 	fi
 	
@@ -98,7 +99,3 @@ echo "Size = $SizeX , $SizeY"
 #make loops
 #make more loops in loops to make the loop loop around
 #make it work
-#text manipulate raw ourput to maybe work, would be easier
-#make the double blank detection work, would eleminate double spaces
-#
-#
