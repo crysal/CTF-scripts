@@ -26,9 +26,23 @@ CurrentXCord=0
 CurrentYCord=0
 BlankDecetcor=0 #Counter for blanks in a row, if goes above 1 should change row and put a slash(/)
 DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 put a Dot (.), if goes above 2 then blank goes to 1 put a Dash (-)
+
+debugEchos () {
+echo "input1=$input1"
+echo "BackgroundValue=$BackgroundValue"
+echo "DotValue=$DotValue"
+echo "SizeX=$SizeX"
+echo "SizeY=$SizeY"
+echo "CurrentXCord=$CurrentXCord"
+echo "BlankDecetcor=$BlankDecetcor"
+echo "DotDecetor=$DotDecetor"
+echo "CurrentRGBValue=$CurrentRGBValue"
+}
+
 while [ $CurrentYCord -lt $SizeY ] 
 do
-
+echo "start of loop"
+debugEchos
 CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$CurrentYCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
 
 
@@ -58,7 +72,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 	
 	if [ $BlankDecetcor -gt 1 ] #Checks if blanks have a number greater than 1, 
 		then 
-		echo "/" >> morse 
+		echo -ne "/" >> morse 
 		BlankDecetcor=0
 		DotDecetor=0
 		CurrentYCord=$(($CurrentYCord+2))
@@ -69,7 +83,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 	
 	if [ $DotDecetor -eq 1 ] && [ $BlankDecetcor -eq 1 ]
 		then
-		echo "." >> morse
+		echo -ne "." >> morse
 		BlankDecetcor=0
 		DotDecetor=0
 		#Debug echo
@@ -78,7 +92,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 	
 	if [ $DotDecetor -gt 1 ] && [ $BlankDecetcor -eq 1 ]
 		then
-		echo "-" >> morse
+		echo -ne "-" >> morse
 		BlankDecetcor=0
 		DotDecetor=0
 		#Debug echo
