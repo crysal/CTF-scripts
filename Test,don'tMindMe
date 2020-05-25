@@ -46,7 +46,7 @@ echo "start of loop"
 CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$CurrentYCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
 
 
-	if [ $CurrentXCord -eq $(($SizeX-1)) ] #Checks if reached the edge of image, if goes to next line
+	if [ $CurrentXCord -eq $(($SizeX-1)) ] #Checks if reached the edge of image, go to start of next line
 		then
 		CurrentXCord=0
 		CurrentYCord=$(($CurrentYCord+1))
@@ -55,16 +55,8 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 	if [ $CurrentRGBValue -eq $BackgroundValue ] #Checks if current pixel is a background
 		then
 		BlankDecetcor=$(($BlankDecetcor+1))
-		
-			if [ $BlankDecetcor -eq 2 ]
-				then
-				echo "/" >> morse
-				CurrentYCord=$(($CurrentYCord+1))
-				CurrentXCord=0
-				BlankDecetcor=0
-			fi
 		#Debug echo
-		echo -ne " space " >> raw_morse 
+		echo -ne "/" >> raw_morse 
 		echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
 		
 		CurrentXCord=$(($CurrentXCord+1)) #move to next pixel
@@ -73,10 +65,12 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 	if [ $CurrentRGBValue -eq $DotValue ] #Checks if current pixel is a dot
 		then
 		DotDecetor=$(($DotDecetor+1))
-		CurrentXCord=$(($CurrentXCord+1))
+		
 		#Debug echo
 		echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
-		echo -ne "dot" >> raw_morse #3 dots in a row = dash
+		echo -ne "." >> raw_morse #3 dots in a row = dash
+		
+		CurrentXCord=$(($CurrentXCord+1))
 	fi
 	
 	# if [ $BlankDecetcor -gt 1 ] #Checks if blanks have a number greater than 1, 
@@ -117,7 +111,7 @@ echo "BackgroundValue = $BackgroundValue"
 echo "DotRGBValue = $DotValue"
 echo "Size = $SizeX , $SizeY"
 
-
+cat raw_morse | sed 's/\/\///g' | sed 'sg/\.\.\./-/' | sed 's/\///g' | sed ':a;N;$!ba;s/\n/\//g' | sed 's/\/\//g' | sed 's/\///g'
 ##TODO
 #make loops
 #make more loops in loops to make the loop loop around
