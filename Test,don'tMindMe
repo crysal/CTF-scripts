@@ -1,16 +1,12 @@
 #!/bin/bash
-#1 blank pixel = l
-#Multiple l's = / (sed 's/l.*l/\//g')
-#>1 non blank = -
-# 1 non blank = . 
-#convert $input1 -crop 1x1+1+1 txt:-
-#1x1 = only show 1 pixel
-#+1+1= move one down & move one left
-#convert $input1 -crop 1x1+$CurrentYCord+$CurrentXCord txt:-
-echo '' > raw_morse
-#Checks if deps are installed
 if [ $(command -v convert) ]; then echo "Installed"; else echo "Install imagemagick (using the convert)"; exit 0; fi
+Flag_="flag_"
+Number=$2
+Zip=".zip"
 
+while [ $Number -ne 0 ]
+	do 
+		echo '' > raw_morse
 
 input1=$1
 BackgroundValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+0+0 txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
@@ -27,21 +23,8 @@ CurrentYCord=0
 BlankDecetcor=0 #Counter for blanks in a row, if goes above 1 should change row and put a slash(/)
 DotDecetor=0    #Counter for dots and dashes, if goes to 1 then blank goes to 1 put a Dot (.), if goes above 2 then blank goes to 1 put a Dash (-)
 
-debugEchos () {
-echo "input1=$input1"
-echo "BackgroundValue=$BackgroundValue"
-echo "DotValue=$DotValue"
-echo "SizeX=$SizeX"
-echo "SizeY=$SizeY"
-echo "CurrentXCord=$CurrentXCord"
-echo "BlankDecetcor=$BlankDecetcor"
-echo "DotDecetor=$DotDecetor"
-echo "CurrentRGBValue=$CurrentRGBValue"
-}
-
 while [ $CurrentYCord -lt $SizeY ]
 do
-#debugEchos
 CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$CurrentYCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
 
 
@@ -55,10 +38,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 	if [ $CurrentRGBValue -eq $BackgroundValue ] #Checks if current pixel is a background
 		then
 		BlankDecetcor=$(($BlankDecetcor+1))
-		#Debug echo
 		echo -ne "/" >> raw_morse
-		#echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
-
 		CurrentXCord=$(($CurrentXCord+1)) #move to next pixel
 	fi
 
@@ -66,54 +46,50 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 		then
 		DotDecetor=$(($DotDecetor+1))
 		CurrentXCord=$(($CurrentXCord+1))
-
-
-		#Debug echo
-		#echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
 		echo -ne "." >> raw_morse #3 dots in a row = dash
 	fi
-	
-	# if [ $BlankDecetcor -gt 1 ] #Checks if blanks have a number greater than 1, 
-		# then 
-		# echo -ne "/" >> morse 
-		# BlankDecetcor=0
-		# DotDecetor=0
-		# CurrentYCord=$(($CurrentYCord+2))
-		# CurrentXCord=0
-		##Debug echo
-		# echo "Dected more than one blank spot after eachother, check morse for a / and $CurrentYCord +2"
-	# fi
-	
-	# if [ $DotDecetor -eq 1 ] && [ $BlankDecetcor -eq 1 ]
-		# then
-		# echo -ne "." >> morse
-		# BlankDecetcor=0
-		# DotDecetor=0
-		##Debug echo
-		# echo "Dected a blank space after one dot space, check morse for a . nothing more should happen for now"
-	# fi
-	
-	# if [ $DotDecetor -gt 1 ] && [ $BlankDecetcor -eq 1 ]
-		# then
-		# echo -ne "-" >> morse
-		# BlankDecetcor=0
-		# DotDecetor=0
-		##Debug echo
-		# echo "Dected a blank after more than one dot space, check morse for a - nothing more should happen for now"
-	# fi
 done
-
-##ending checks of vars
-echo "CurrentRGBValue = $CurrentRGBValue"
-echo "CurrentXCord = $CurrentXCord"
-echo "CurrentYCord = $CurrentYCord"
-echo "BackgroundValue = $BackgroundValue"
-echo "DotRGBValue = $DotValue"
-echo "Size = $SizeX x $SizeY"
-
 morse=$(cat raw_morse | sed 's/\/\///g' | sed 's/\.\.\./-/g' | sed 's/\///g' | sed ':a;N;$!ba;s/\n/\//g' | sed 's/\/\//+/g' | sed 's/\///g')
-curl 'https://www.thecalculator.co/includes/forms/morse_translator_ajax.php' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: https://www.thecalculator.co' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://www.thecalculator.co/others/English-Morse-Code-Translator-43.html' -H 'Cookie: PHPSESSID=d186703f4b0b04d9ebf088517bad79af; cookieconsent_status=allow; _ga=GA1.2.348595470.1590395489; _gid=GA1.2.376002860.1590395489; _gat=1' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: Trailers' --data-raw 'input=$morse&submit=Translate'
-##TODO
-#make loops
-#make more loops in loops to make the loop loop around
-#make it work
+
+#
+#Translating and unzipping
+#
+
+
+out=$(curl 'https://www.thecalculator.co/includes/forms/morse_translator_ajax.php'\
+ -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0'\
+ -H 'Accept: */*'\
+ -H 'Accept-Language: en-US,en;q=0.5'\
+ --compressed\
+ -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8'\
+ -H 'X-Requested-With: XMLHttpRequest'\
+ -H 'Origin: https://www.thecalculator.co'\
+ -H 'DNT: 1' -H 'Connection: keep-alive'\
+ -H 'Referer: https://www.thecalculator.co/others/English-Morse-Code-Translator-43.html'\
+ -H 'Cookie: PHPSESSID=d186703f4b0b04d9ebf088517bad79af; cookieconsent_status=allow; _ga=GA1.2.348595470.1590395489; _gid=GA1.2.376002860.1590395489; _gat=1'\
+ -H 'Pragma: no-cache'\
+ -H 'Cache-Control: no-cache'\
+ -H 'TE: Trailers'\
+ --data-raw "input=$morse&submit=Translate")
+pass=$(echo $out | awk '{print $8}' | sed 's/.*\">//g' | sed 's/<\/.*//g')
+echo "password for $file is $pass"
+
+		file="$Flag_$Number$Zip"
+		echo "Attacking file '$file' with wordlist '$wordlist'.."
+			if unzip -o -P "$pass" $file > /dev/null 2>&1
+				then
+				echo "Successfully cracked file with password: $pass"
+				echo "Decreasing $file to match new extract, aka $flag$(($Number-1))$Zip"
+				echo "Cleaning up and getting ready for next file"
+				echo "Password for $file is $pass" >> passwords
+				sleep 3
+				mv $input1 $Number$input1
+				mv flag/$input1 ./
+				mv flag/* ./
+				rm flag -d
+			else
+				echo -en "Failed, send help"
+			fi
+		Number=$(($Number-1))
+		sleep 2
+done
