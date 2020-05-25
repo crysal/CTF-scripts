@@ -8,7 +8,6 @@ do
 echo '' > raw_morse
 file=""$Number".zip"
 
-
 #
 #Morse Code Reader
 #
@@ -57,6 +56,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 done
 morse=$(cat raw_morse | sed 's/\/\///g' | sed 's/\.\.\./-/g' | sed 's/\///g' | sed ':a;N;$!ba;s/\n/\//g' | sed 's/\/\//++/g' | sed 's/\///g')
 echo $morse >> morse
+
 #
 #End of Morse Code Reader
 #
