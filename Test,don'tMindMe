@@ -1,5 +1,3 @@
-curl 'https://www.thecalculator.co/includes/forms/morse_translator_ajax.php' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: https://www.thecalculator.co' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://www.thecalculator.co/others/English-Morse-Code-Translator-43.html' -H 'Cookie: PHPSESSID=d186703f4b0b04d9ebf088517bad79af; cookieconsent_status=allow; _ga=GA1.2.348595470.1590395489; _gid=GA1.2.376002860.1590395489; _gat=1' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: Trailers' --data-raw 'input=+....-+---..+.----+..---+--...+..---&submit=Translate'
-
 #!/bin/bash
 #1 blank pixel = l
 #Multiple l's = / (sed 's/l.*l/\//g')
@@ -43,7 +41,6 @@ echo "CurrentRGBValue=$CurrentRGBValue"
 
 while [ $CurrentYCord -lt $SizeY ]
 do
-echo "start of loop"
 #debugEchos
 CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$CurrentYCord txt:- | tail -1 | awk '{print $4}' | sed 's/srgb(//g' | sed 's/)//g' | sed 's/,/+/g')}")
 
@@ -60,7 +57,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 		BlankDecetcor=$(($BlankDecetcor+1))
 		#Debug echo
 		echo -ne "/" >> raw_morse
-		echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
+		#echo "Current value is the same as the background ($CurrentRGBValue = $BackgroundValue)"
 
 		CurrentXCord=$(($CurrentXCord+1)) #move to next pixel
 	fi
@@ -72,7 +69,7 @@ CurrentRGBValue=$(awk "BEGIN {print $(convert $input1 -crop 1x1+$CurrentXCord+$C
 
 
 		#Debug echo
-		echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
+		#echo "Current value is the same as a dot ($CurrentRGBValue = $DotValue)"
 		echo -ne "." >> raw_morse #3 dots in a row = dash
 	fi
 	
@@ -112,11 +109,11 @@ echo "CurrentXCord = $CurrentXCord"
 echo "CurrentYCord = $CurrentYCord"
 echo "BackgroundValue = $BackgroundValue"
 echo "DotRGBValue = $DotValue"
-echo "Size = $SizeX , $SizeY"
+echo "Size = $SizeX x $SizeY"
 
-
+morse=$(cat raw_morse | sed 's/\/\///g' | sed 's/\.\.\./-/g' | sed 's/\///g' | sed ':a;N;$!ba;s/\n/\//g' | sed 's/\/\//+/g' | sed 's/\///g')
+curl 'https://www.thecalculator.co/includes/forms/morse_translator_ajax.php' -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:76.0) Gecko/20100101 Firefox/76.0' -H 'Accept: */*' -H 'Accept-Language: en-US,en;q=0.5' --compressed -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' -H 'X-Requested-With: XMLHttpRequest' -H 'Origin: https://www.thecalculator.co' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Referer: https://www.thecalculator.co/others/English-Morse-Code-Translator-43.html' -H 'Cookie: PHPSESSID=d186703f4b0b04d9ebf088517bad79af; cookieconsent_status=allow; _ga=GA1.2.348595470.1590395489; _gid=GA1.2.376002860.1590395489; _gat=1' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' -H 'TE: Trailers' --data-raw 'input=$morse&submit=Translate'
 ##TODO
 #make loops
 #make more loops in loops to make the loop loop around
 #make it work
-
