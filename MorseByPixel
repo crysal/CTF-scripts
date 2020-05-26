@@ -6,8 +6,6 @@ input1=$1
 while [ $Number -ne 1 ]
 do
 echo '' > raw_morse
-file=""$Number".zip"
-
 #
 #Morse Code Reader
 #
