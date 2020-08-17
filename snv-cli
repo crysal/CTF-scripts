@@ -1,0 +1,21 @@
+#!/bin/bash
+if [ $# -eq 0 ]; then
+echo "Usage: $0 <ip address>"
+exit 1
+fi
+hostname=svn://$1/
+while [ true ]
+do
+printf "\$ $hostname : "
+read -r input
+case "$input" in
+        cd)hostname=svn://$1/;;
+        cd*)hostname="$hostname$(echo $input | awk '{print $2}')/";;
+        cat*)cmd="svn cat $hostname$(echo $input | awk '{print $2}')";$cmd;;
+        ls)cmd="svn ls $hostname";$cmd;;
+        info)cmd="svn info $hostname";$cmd;;
+        log)cmd="svn log $hostname";$cmd;;
+        help)echo -e "cd - goto main dir\ncd <dir> - goto dir\ncat <file> - read file\nls - list content\ninfo - get info about current server\nlog - get logs about current server";;
+        *)echo "---------------------";;
+esac
+done
